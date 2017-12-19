@@ -3,9 +3,6 @@ package service;
 import java.util.List;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,51 +11,7 @@ import entity.StudentInfo;
 
 @Transactional 
 @Component(value = "studentInfoService")
-public class StudentInfoService implements IStudentInfoService{
-
-	@Autowired
-	private SessionFactory sessionFactory;
-	
-	
-
-	public SessionFactory getSessionFactory() {
-		return sessionFactory;
-	}
-
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
-	}
-
-	@Override
-	public void saveOrUpdate(StudentInfo studentInfo) {
-		getSession().saveOrUpdate(studentInfo);
-	}
-
-	@Override
-	public void delete(StudentInfo studentInfo) {
-		getSession().delete(studentInfo);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<StudentInfo> findAll() {
-		String sql="select * from t_stuinfo";
-		Query query = getSession().createSQLQuery(sql).addEntity(StudentInfo.class);
-		return query.list();
-	}
-
-	@Override
-	public StudentInfo findById(int id) {
-		String sql="select * from t_stuinfo where id=?";
-		Query query = getSession().createSQLQuery(sql).addEntity(StudentInfo.class).setInteger(0, id);
-		StudentInfo studentinfo = (StudentInfo) query.uniqueResult();
-		return studentinfo;
-	}
-
-	@Override
-	public Session getSession() {
-		return getSessionFactory().getCurrentSession();
-	}
+public class StudentInfoService extends BaseService<StudentInfo> implements IStudentInfoService{
 
 	@SuppressWarnings("unchecked")
 	@Override

@@ -3,16 +3,18 @@ package service;
 import java.util.List;
 
 import org.hibernate.Session;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface IBaseService<T> {
 	
-	public void saveOrUpdate(T t);    //±£´æÐÞ¸Ä
+	public void saveOrUpdate(T t);    //ï¿½ï¿½ï¿½ï¿½ï¿½Þ¸ï¿½
 	
-	public void delete(T t);    //É¾³ý
+	public void delete(T t);    //É¾ï¿½ï¿½
 	
-	public List<T> findAll();      //²éÑ¯È«²¿
+	public List<T> findAll();      //ï¿½ï¿½Ñ¯È«ï¿½ï¿½
 	
-	public T findById(int id);    //¸ù¾Ýid²éÑ¯
+	public T findById(int id);    //ï¿½ï¿½ï¿½ï¿½idï¿½ï¿½Ñ¯
 	
-	public Session getSession();  //»ñÈ¡µ±Ç°µÄSession
+	public Session getSession();  //ï¿½ï¿½È¡ï¿½ï¿½Ç°ï¿½ï¿½Session
 }

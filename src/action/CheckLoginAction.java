@@ -9,6 +9,7 @@ import org.apache.struts2.convention.annotation.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.opensymphony.xwork2.ActionContext;
+import com.opensymphony.xwork2.ActionSupport;
 
 import entity.Admin;
 import entity.StudentInfo;
@@ -16,7 +17,7 @@ import service.IAdminService;
 import service.IStudentInfoService;
 
 @Namespace(value="/checkLogin")
-public class CheckLoginAction {
+public class CheckLoginAction extends ActionSupport{
 	
 	private static final long serialVersionUID = 1L;
 
@@ -24,8 +25,6 @@ public class CheckLoginAction {
 	private IAdminService adminService;
 	
 	private Admin admin; //页面上传过来的对象
-	
-	private String id;
 	
 	private String code;//输入的验证码
 	
@@ -42,6 +41,8 @@ public class CheckLoginAction {
     private Map<String,Object> session = actionContext.getSession(); 
     
     private String image;
+    
+    private String id;
     
     @Autowired
 	private IStudentInfoService studentInfoService;

@@ -13,7 +13,7 @@ import org.apache.struts2.convention.annotation.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.opensymphony.xwork2.ActionContext;
-import com.opensymphony.xwork2.ActionSupport;
+
 import com.opensymphony.xwork2.Preparable;
 
 import entity.Course;
@@ -26,7 +26,7 @@ import service.ICourseService;
 
 @ParentPackage("default")  
 @Namespace("/course")
-public class CourseAction extends ActionSupport implements Preparable{
+public class CourseAction extends BaseAction<Course, String> implements Preparable{
 	
 	/**
 	 * 
@@ -39,10 +39,6 @@ public class CourseAction extends ActionSupport implements Preparable{
 	private List<Course> courseList;
 	
 	private Course course;
-	
-	private String id;
-	
-	private String ids;//批量删除
 
 	public ICourseService getCourseService() {
 		return courseService;
@@ -51,8 +47,7 @@ public class CourseAction extends ActionSupport implements Preparable{
 	public void setCourseService(ICourseService courseService) {
 		this.courseService = courseService;
 	}
-
-
+	
 	public List<Course> getCourseList() {
 		return courseList;
 	}
@@ -69,30 +64,8 @@ public class CourseAction extends ActionSupport implements Preparable{
 		this.course = course;
 	}
 	
-	public String getId() {
-		return id;
-	}
 
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getIds() {
-		return ids;
-	}
-
-	public void setIds(String ids) {
-		this.ids = ids;
-	}
-
-	@Override
-	public void prepare() throws Exception {
-		if(id == null ||id.equals("")) {
-			course = new Course();
-		}else {
-			course = courseService.findById(Integer.parseInt(id));
-		}
-	}
+	
 	@SuppressWarnings("unchecked")
 	@Action(value="list",results = { @Result(name = "list", type="json",params={"root","courseList"})})
 	public String list() {
@@ -131,24 +104,13 @@ public class CourseAction extends ActionSupport implements Preparable{
 	
 	@Action(value="delete")
 	public String delete() {
-		try {
-			if(ids != null) {
-				String[] id = ids.split(",");
-				for(int i = 0;i<id.length;i++) {
-					course = courseService.findById(Integer.parseInt(id[i]));
-					courseService.delete(course);
-				}
-			}
-		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return NONE;
+		return "delete";
 	}
 	@Action(value="edit",results = {
-            @Result(name = "success", location = "/admin/page/course/courseAdd.jsp")})
+            @Result(name = "edit", location = "/admin/page/course/courseAdd.jsp")})
 	public String edit() {
-		return "success";
+		course = entity;
+		return "edit";
 	}
 	@Action(value="withdrawal")
 	public String withdrawal() {

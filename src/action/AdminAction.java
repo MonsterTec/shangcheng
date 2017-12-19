@@ -15,10 +15,8 @@ import org.apache.struts2.convention.annotation.Namespace;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.opensymphony.xwork2.ActionContext;
-import com.opensymphony.xwork2.ActionSupport;
 import com.opensymphony.xwork2.Preparable;
 
 import entity.Admin;
@@ -28,7 +26,7 @@ import service.IStudentInfoService;
 
 @ParentPackage("default")
 @Namespace("/Admin")
-public class AdminAction extends ActionSupport implements Preparable{
+public class AdminAction extends BaseAction<Admin, String> implements Preparable{
 	
 	/**
 	 * 
@@ -46,7 +44,7 @@ public class AdminAction extends ActionSupport implements Preparable{
 	
 	private String userName;//用户名
 	
-	private Map<String,Object> msg = new HashMap<String,Object>();//后台返回信息
+	private Map<String,Object> message = new HashMap<String,Object>();//后台返回信息
 	
 	private String type;//返回页面的type
 	
@@ -68,14 +66,7 @@ public class AdminAction extends ActionSupport implements Preparable{
 	private File file;
 	
 	private String fileFileName;
-	@Override
-	public void prepare() throws Exception {
-		if(id == null ||id.equals("")) {
-			admin = new Admin();
-		}else {
-			admin = adminService.findById(Integer.parseInt(id));
-		}
-	}
+
 	
 	//文件上传
 	@Action(value="upload",results={@Result(name = "upload", type="json",params={"root","image"})})
@@ -92,23 +83,15 @@ public class AdminAction extends ActionSupport implements Preparable{
 	}
 	
 	@Action(value="save",results = {
-            @Result(name = "success", type="json",params={"root","msg"})})
+            @Result(name = "save", type="json",params={"root","msg"})})
 	public String save() {
-		try {
-			adminService.saveOrUpdate(admin);
-			msg.put("state", true);
-			msg.put("msg", "保存成功");
-		} catch (Exception e) {
-			msg.put("state", false);
-			msg.put("msg", "保存失败");
-			e.printStackTrace();
-		}
-		return "success";
+		return "save";
 	}
 	@Action(value="edit",results = {
-            @Result(name = "success", location = "/admin/page/user/userInfo.jsp")})
+            @Result(name = "edit", location = "/admin/page/user/userInfo.jsp")})
 	public String edit() {
-		return "success";
+		admin=entity;
+		return "edit";
 	}
 	
 	@Action(value="quit",results = { @Result(name = "quit", location = "/admin/login/login.jsp")})
@@ -129,10 +112,10 @@ public class AdminAction extends ActionSupport implements Preparable{
 						type = studentInfo.getType();
 						id=Integer.toString(studentInfo.getId());
 						userName = studentInfo.getStu_id();
-						msg.put("state", true);
+						message.put("state", true);
 						return "lockScreen";
 					}else {
-						msg.put("state", false);
+						message.put("state", false);
 						return "lockScreen";
 					}
 				}else {
@@ -140,13 +123,11 @@ public class AdminAction extends ActionSupport implements Preparable{
 					type = adminResult.getType();
 					id=Integer.toString(adminResult.getId());
 					userName = adminResult.getUsername();
-					msg.put("state", true);
+					message.put("state", true);
 					return "lockScreen";
 				}
 			}
 		} catch (Exception e) {
-			msg.put("state", false);
-			return "lockScreen";
 		}
 		return "lockScreen";
 	}
@@ -154,36 +135,36 @@ public class AdminAction extends ActionSupport implements Preparable{
 			@Result(name = "changePwd", type="json",params={"root","msg"})})
 	public String changePwd() {
 		try {
-			if(admin != null) {
-				Admin adminResult =  adminService.checkLogin(admin);
-				StudentInfo studentInfo = studentInfoService.checkLogin(admin.getUsername(), admin.getPassword());
+			if(entity != null) {
+				Admin adminResult =  adminService.checkLogin(entity);
+				StudentInfo studentInfo = studentInfoService.checkLogin(entity.getUsername(), entity.getPassword());
 				if(adminResult == null) {
 					if(studentInfo != null) {
 						studentInfo.setPassword(password);
 						studentInfoService.saveOrUpdate(studentInfo);
-						msg.put("state", true);
-						msg.put("msg", "密码修改成功");
+						message.put("state", true);
+						message.put("msg", "密码修改成功");
 						return "changePwd";
 					}else {
-						msg.put("state", false);
-						msg.put("msg", "旧密码错误");
+						message.put("state", false);
+						message.put("msg", "旧密码错误");
 						return "changePwd";
 					}
 				}else {
 					adminResult.setPassword(password);
 					adminService.saveOrUpdate(adminResult);
-					msg.put("state", true);
-					msg.put("msg", "密码修改成功");
+					message.put("state", true);
+					message.put("msg", "密码修改成功");
 					return "changePwd";
 				}
 			}else {
-				msg.put("state", false);
-				msg.put("msg", "旧密码错误");
+				message.put("state", false);
+				message.put("msg", "旧密码错误");
 				return "changePwd";
 			}
 		} catch (Exception e) {
-			msg.put("state", false);
-			msg.put("msg", "密码修改失败");
+			message.put("state", false);
+			message.put("msg", "密码修改失败");
 			return "lockScreen";
 		}
 	}
@@ -223,12 +204,14 @@ public class AdminAction extends ActionSupport implements Preparable{
 		this.id = id;
 	}
 	
-	public Map<String, Object> getMsg() {
-		return msg;
+	public Map<String, Object> getMessage() {
+		return message;
 	}
-	public void setMsg(Map<String, Object> msg) {
-		this.msg = msg;
+
+	public void setMessage(Map<String, Object> message) {
+		this.message = message;
 	}
+
 	public String getType() {
 		return type;
 	}

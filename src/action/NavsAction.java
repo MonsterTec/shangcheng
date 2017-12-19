@@ -5,13 +5,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.struts2.convention.annotation.Action;
-import org.apache.struts2.convention.annotation.InterceptorRef;
+
 import org.apache.struts2.convention.annotation.Namespace;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.opensymphony.xwork2.ActionSupport;
 import com.opensymphony.xwork2.Preparable;
 
 import entity.Navs;
@@ -21,7 +20,7 @@ import service.INavsService;
 
 @ParentPackage("default") 
 @Namespace("/Navs")
-public class NavsAction extends ActionSupport implements Preparable{
+public class NavsAction extends BaseAction<Navs, String> implements Preparable{
 
 	/**
 	 * 
@@ -39,11 +38,8 @@ public class NavsAction extends ActionSupport implements Preparable{
 	
 	private String parentId;//父模块的ID
 	
-	private String id;//删除或修改需要的ID
-	
 	private String type;//登录用户类型
 	
-	private String ids;//批量删除
 	
 	@Action(value="findAll", results = { @Result(name = "navs", type="json",params={"root","result"})})
 	public String findAll() {
@@ -68,15 +64,14 @@ public class NavsAction extends ActionSupport implements Preparable{
 		
 		return "navs";
 	}
-	@Action(value="list", results = { @Result(name = "list", type="json",params={"root","navs"})})
+	@Action(value="list", results = { @Result(name = "list", type="json",params={"root","list"})})
 	public String list() {
-		navs = navsService.findAll();
 		return "list";
 	}
 	@Action(value="view",results = {
             @Result(name = "success", location = "/admin/page/navs/navsAdd.jsp")})
 	public String view() {
-		nav = navsService.findById(Integer.parseInt(id));
+		nav = entity;
 		return "success";
 	}
 	@Action(value="save")
@@ -89,19 +84,7 @@ public class NavsAction extends ActionSupport implements Preparable{
 	}
 	@Action(value="delete")
 	public String delete() {
-		try {
-			if(ids != null) {
-				String[] id = ids.split(",");
-				for(int i = 0;i<id.length;i++) {
-					Navs navsDelete = navsService.findById(Integer.parseInt(id[i]));
-					navsService.delete(navsDelete);
-				}
-			}
-		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return NONE;
+		return "delete";
 	}
 	public INavsService getNavsService() {
 		return navsService;
@@ -138,12 +121,6 @@ public class NavsAction extends ActionSupport implements Preparable{
 	public void setParentId(String parentId) {
 		this.parentId = parentId;
 	}
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
 
 	public String getType() {
 		return type;
@@ -153,18 +130,4 @@ public class NavsAction extends ActionSupport implements Preparable{
 	}
 	
 	
-	public String getIds() {
-		return ids;
-	}
-	public void setIds(String ids) {
-		this.ids = ids;
-	}
-	@Override
-	public void prepare() throws Exception {
-		if(id == null || id.equals("")) {
-			nav = new Navs();
-		}else {
-			nav = navsService.findById(Integer.parseInt(id));
-		}
-	}
 }

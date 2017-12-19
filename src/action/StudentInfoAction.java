@@ -6,14 +6,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.struts2.convention.annotation.Action;
-import org.apache.struts2.convention.annotation.InterceptorRef;
+
 import org.apache.struts2.convention.annotation.Namespace;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.opensymphony.xwork2.ActionSupport;
-import com.opensymphony.xwork2.Preparable;
 
 import entity.Course;
 import entity.Dictionary;
@@ -25,9 +23,9 @@ import net.sf.json.util.CycleDetectionStrategy;
 import service.IDictionaryServcie;
 import service.IStudentInfoService;
 
-@ParentPackage("default")  
+@ParentPackage("default")
 @Namespace("/studentInfo")
-public class StudentInfoAction extends ActionSupport implements Preparable{
+public class StudentInfoAction extends BaseAction<StudentInfo, String>{
 
 	/**
 	 * 
@@ -41,9 +39,7 @@ public class StudentInfoAction extends ActionSupport implements Preparable{
 	
 	private StudentInfo stu;
 	
-	private String id;
-	
-	private List<Dictionary> list;
+	private List<Dictionary> listForDictionary;
 	
 	private String parentId;
 	
@@ -53,10 +49,6 @@ public class StudentInfoAction extends ActionSupport implements Preparable{
 	private String name;
 	
 	private Set<Course> course;
-	
-
-	private String ids;//批量删除
-
 	
 	public String getName() {
 		return name;
@@ -82,20 +74,12 @@ public class StudentInfoAction extends ActionSupport implements Preparable{
 		this.parentId = parentId;
 	}
 
-	public List<Dictionary> getList() {
-		return list;
+	public List<Dictionary> getListForDictionary() {
+		return listForDictionary;
 	}
 
-	public void setList(List<Dictionary> list) {
-		this.list = list;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
+	public void setListForDictionary(List<Dictionary> listForDictionary) {
+		this.listForDictionary = listForDictionary;
 	}
 
 	public IStudentInfoService getStudentInfoService() {
@@ -121,15 +105,15 @@ public class StudentInfoAction extends ActionSupport implements Preparable{
 	public void setCourse(Set<Course> course) {
 		this.course = course;
 	}
-
-	public String getIds() {
-		return ids;
+	public StudentInfo getStu() {
+		return stu;
 	}
 
-	public void setIds(String ids) {
-		this.ids = ids;
+	public void setStu(StudentInfo stu) {
+		this.stu = stu;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Action(value="list",results = { @Result(name = "list", type="json",params={"root","stuInfo"})})
 	public String list() {
 		stuInfo = new ArrayList<StudentInfo>();
@@ -156,39 +140,26 @@ public class StudentInfoAction extends ActionSupport implements Preparable{
 
 	@Action(value="save")
 	public String save() {
-		studentInfoService.saveOrUpdate(stu);
-		return NONE;
+		return "save";
 	}
 
 	@Action(value="delete")
 	public String delete() {
-		try {
-			if(ids != null) {
-				String[] id = ids.split(",");
-				for(int i = 0;i<id.length;i++) {
-					StudentInfo stuDelete = studentInfoService.findById(Integer.parseInt(id[i]));
-					studentInfoService.delete(stuDelete);
-				}
-			}
-		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return NONE;
+		return "delete";
 	}
 
 	@Action(value="view",results = {
-            @Result(name = "success", location = "/admin/page/studentInfo/studentInfoView.jsp")})
+            @Result(name = "view", location = "/admin/page/studentInfo/studentInfoView.jsp")})
 	public String view() {
-		stu = studentInfoService.findById(Integer.parseInt(id));
-		return "success";
+		stu = entity;
+		return "view";
 	}
 
 	@Action(value="edit",results = {
-            @Result(name = "success", location = "/admin/page/studentInfo/studentInfoAdd.jsp")})
+            @Result(name = "edit", location = "/admin/page/studentInfo/studentInfoAdd.jsp")})
 	public String edit() {
-		stu = studentInfoService.findById(Integer.parseInt(id));
-		return "success";
+		stu = entity;
+		return "edit";
 	}
 	
 	@Action(value="perInfoedit",results = {
@@ -200,15 +171,20 @@ public class StudentInfoAction extends ActionSupport implements Preparable{
 
 
 
-	@Action(value="listForSelect",results = { @Result(name = "listForSelect", type="json",params={"root","list"})})
+	@Action(value="listForSelect",results = { @Result(name = "listForSelect", type="json",params={"root","listForDictionary"})})
 	public String listForSelect() {
-		list = studentInfoService.findByPId(Integer.parseInt(parentId));
+		listForDictionary = studentInfoService.findByPId(Integer.parseInt(parentId));
 		return "listForSelect";
 	}
 
-	@Action(value="listForProvice",results = { @Result(name = "listForSelect", type="json",params={"root","list"})})
+	@Action(value="listForProvice",results = { @Result(name = "listForSelect", type="json",params={"root","listForDictionary"})})
 	public String listForProvice() {
-		list = dictionaryService.findByName(name);
+		try {
+			listForDictionary = dictionaryService.findByName(name);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return "listForSelect";
 	}
 	@Action(value="courseSelected",results = { @Result(name = "courseSelected", type="json",params={"root","course"})})
@@ -216,20 +192,6 @@ public class StudentInfoAction extends ActionSupport implements Preparable{
 		course = stu.getCourse();
 		return "courseSelected";
 	}
-	public StudentInfo getStu() {
-		return stu;
-	}
 
-	public void setStu(StudentInfo stu) {
-		this.stu = stu;
-	}
 
-	@Override
-	public void prepare() throws Exception {
-		if(id == null ||id.equals("")) {
-			stu = new StudentInfo();
-		}else {
-			stu = studentInfoService.findById(Integer.parseInt(id));
-		}
-	}
 }

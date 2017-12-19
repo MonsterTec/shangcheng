@@ -20,7 +20,7 @@
 		<div class="layui-form-item">
 			<label class="layui-form-label">学生姓名</label>
 			<div class="layui-input-block">
-				<input type="text" class="layui-input newsName" value="<s:property value='stu.stu_name' />" lay-verify="required" placeholder="请输入学生姓名" name="stu.stu_name">
+				<input type="text" class="layui-input newsName" value="<s:property value='stu_name' />" lay-verify="required" placeholder="请输入学生姓名" name="stu.stu_name">
 			</div>
 		</div>
 		<div class="layui-form-item">

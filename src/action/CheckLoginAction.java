@@ -25,6 +25,7 @@ public class CheckLoginAction {
 	
 	private Admin admin; //页面上传过来的对象
 	
+	
 	private String id;
 	
 	private String code;//输入的验证码

@@ -13,50 +13,7 @@ import entity.Dictionary;
 
 @Transactional 
 @Component(value = "dictionaryService")
-public class DictionaryService implements IDictionaryServcie{
-
-	@Autowired
-	private SessionFactory sessionFactory;
-	
-	@Override
-	public void saveOrUpdate(Dictionary dictionary) {
-		getSession().saveOrUpdate(dictionary);
-	}
-
-	@Override
-	public void delete(Dictionary dictionary) {
-		getSession().delete(dictionary);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<Dictionary> findAll() {
-		String sql = "select * from system_dictionary";
-		Query query = getSession().createSQLQuery(sql).addEntity(Dictionary.class);
-		return query.list();
-	}
-
-	@Override
-	public Dictionary findById(int id) {
-		String sql = "select * from system_dictionary where id = ?";
-		Query query = getSession().createSQLQuery(sql).addEntity(Dictionary.class).setInteger(0, id);
-		Dictionary dictionary = (Dictionary) query.uniqueResult();
-		return dictionary;
-	}
-
-	
-	@Override
-	public Session getSession() {
-		return getSessionFactory().getCurrentSession();
-	}
-
-	public SessionFactory getSessionFactory() {
-		return sessionFactory;
-	}
-
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
-	}
+public class DictionaryService extends BaseService<Dictionary> implements IDictionaryServcie{
 
 	@SuppressWarnings("unchecked")
 	@Override

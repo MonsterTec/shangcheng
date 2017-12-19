@@ -5,13 +5,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.struts2.convention.annotation.Action;
-import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Namespace;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.opensymphony.xwork2.ActionSupport;
 import com.opensymphony.xwork2.Preparable;
 
 import entity.Dictionary;
@@ -19,15 +17,13 @@ import service.IDictionaryServcie;
 
 @ParentPackage("default") 
 @Namespace("/dictionary")
-public class DictionaryAction extends ActionSupport implements Preparable{
+public class DictionaryAction extends BaseAction<Dictionary, String> implements Preparable{
 
 	
 	private static final long serialVersionUID = 1L;
 	
 	@Autowired
 	private IDictionaryServcie dictionaryService;
-	
-	private String id;
 	
 	private Dictionary dictionary;
 	
@@ -89,9 +85,8 @@ public class DictionaryAction extends ActionSupport implements Preparable{
 		return "dictionary";
 	}
 	@Action(value="delete")
-	public String delete() {
-		dictionaryService.delete(dictionary);
-		return NONE;
+	public String delete() {		
+		return "delete";
 	}
 	@Action(value="listForTree", results = { @Result(name = "dictionary", type="json",params={"root","result"})})
 	public String listForTree() {
@@ -133,16 +128,7 @@ public class DictionaryAction extends ActionSupport implements Preparable{
 	}
 	@Action(value="save")
 	public String save() {
-		dictionaryService.saveOrUpdate(dictionary);
-		return NONE;
-	}
-	@Override
-	public void prepare() throws Exception {
-		if(id == null || id.equals("")) {
-			dictionary = new Dictionary();
-		}else {
-			dictionary = dictionaryService.findById(Integer.parseInt(id));
-		}
+		return "save";
 	}
 
 }
